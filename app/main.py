@@ -1,14 +1,24 @@
 """FastAPI app for GloVe text similarity."""
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, Query
 from fastapi.responses import Response
 from pydantic import BaseModel
 
-from app.glove import glove_similarity
+from app.glove import _get_model, glove_similarity
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    _get_model()
+    yield
+
 
 app = FastAPI(
     title="GloVe Interests Matcher",
     description="Stateless word similarity comparison using GloVe embeddings",
     version="0.1.0",
+    lifespan=lifespan,
 )
 
 
